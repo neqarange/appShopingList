@@ -97,8 +97,9 @@ Frontend poběží na adrese:
 
 ## 🪄 Poznámky
 
-- V adresáři `data/` jsou prozatím uložené statické mock datové soubory.
+- V adresáři `data/` jsou prozatím uložené statické datové soubory.
 - Backend (`index.js`) lze později rozšířit o REST API pro ukládání a čtení dat.
+- Take to musim spojit s databazi
 - Tailwind je nakonfigurován přes `postcss.config.js` a `tailwind.config.js`.
 
 ---
