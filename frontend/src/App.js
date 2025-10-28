@@ -1,10 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import DashboardPage from "./pages/DashboardPage";
+import DetailPage from "./pages/DetailPage";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <h1 className="text-5xl font-bold text-blue-600">
-        Tailwind funguje 🎉
-      </h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/detail/:id" element={<DetailPage />} />
+      </Routes>
+    </Router>
   );
 }
 
