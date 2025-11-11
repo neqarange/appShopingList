@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ListCard from "../components/Dashboard/ListCard";
-import { shoppingLists } from "../data/shoppingLists";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api";
 
 export default function DashboardPage() {
-  const [lists] = useState(shoppingLists);
+  const [lists, setLists] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.getLists().then(setLists).catch(console.error);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -16,11 +20,11 @@ export default function DashboardPage() {
       <div className="grid gap-4">
         {lists.map((list) => (
           <ListCard
-            key={list.id}
-            title={list.title}
-            members={list.members}
-            items={list.items}
-            onClick={() => navigate(`/detail/${list.id}`)}
+            key={list._id}
+            title={list.name}
+            members={list.sharedWith?.length ? list.sharedWith.map(String) : []}
+            items={(list.items || []).slice(0,3).map(it => ({ name: it.name, isChecked: !!it.bought }))}
+            onClick={() => navigate(`/detail/${list._id}`)}
           />
         ))}
       </div>
