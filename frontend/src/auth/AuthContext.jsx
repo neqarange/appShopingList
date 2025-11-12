@@ -13,8 +13,8 @@ export default function AuthProvider({ children }) {
       const { token } = await api.login(email, password);
       setToken(token); setUser({ token });
     },
-    async register(email, password) {
-      await api.register(email, password);
+    async register(name, surename, email, password) {
+      await api.register(name, surename, email, password);
     },
     logout() {
       localStorage.removeItem('token'); setUser(null);
