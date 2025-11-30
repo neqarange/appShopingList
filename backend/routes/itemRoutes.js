@@ -62,4 +62,85 @@ router.put(
   }
 );
 
+router.get("/:listId/items/:itemId", authRequired, async (req, res) => {
+  try {
+    const { listId, itemId } = req.params;
+
+    const list = await List.findById(listId);
+    if (!list) return res.status(404).json({ message: "List not found" });
+
+    const userId = req.user.id;
+    const isOwner = list.owner.toString() === userId;
+    const isShared = list.sharedWith.map(String).includes(userId);
+
+    if (!isOwner && !isShared) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const item = await Item.findOne({ _id: itemId, listId });
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to load item" });
+  }
+});
+
+router.put("/:listId/items/:itemId", authRequired, async (req, res) => {
+  try {
+    const { listId, itemId } = req.params;
+    const { name, description, quantity } = req.body;
+
+    const list = await List.findById(listId);
+    if (!list) return res.status(404).json({ message: "List not found" });
+
+    const userId = req.user.id;
+    const isOwner = list.owner.toString() === userId;
+    const isShared = list.sharedWith.map(String).includes(userId);
+
+    if (!isOwner && !isShared) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const item = await Item.findOne({ _id: itemId, listId });
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    if (name) item.name = name;
+    if (description !== undefined) item.description = description;
+    if (quantity !== undefined) item.quantity = quantity;
+
+    await item.save();
+
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+
+router.delete("/:listId/items/:itemId", authRequired, async (req, res) => {
+  try {
+    const { listId, itemId } = req.params;
+
+    const list = await List.findById(listId);
+    if (!list) return res.status(404).json({ message: "List not found" });
+
+    const userId = req.user.id;
+    const isOwner = list.owner.toString() === userId;
+    const isShared = list.sharedWith.map(String).includes(userId);
+
+    if (!isOwner && !isShared) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const item = await Item.findOne({ _id: itemId, listId });
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    await item.deleteOne();
+
+    res.status(204).end();
+  } catch (err) {
+    res.status(500).json({ message: "Delete failed" });
+  }
+});
+
 export default router;

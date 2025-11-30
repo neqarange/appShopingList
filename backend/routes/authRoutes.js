@@ -8,7 +8,7 @@ const router = Router();
 // POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
-    const {name, surename, email, password } = req.body;
+    const { name, surename, email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ message: "Email and password required" });
     const exists = await User.findOne({ email });
