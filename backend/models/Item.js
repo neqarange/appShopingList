@@ -9,10 +9,11 @@ const itemSchema = new mongoose.Schema(
       index: true,
     },
     name: { type: String, required: true },
+    description: { type: String, default: "" },
+    quantity: { type: Number, default: 1, min: 1 },
     bought: { type: Boolean, default: false },
     archived: { type: Boolean, default: false },
   },
-
   { timestamps: true }
 );
 
