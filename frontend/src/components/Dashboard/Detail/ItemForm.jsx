@@ -5,7 +5,7 @@ import SaveNewItem from "./SaveNewItem";
 
 export default function ItemForm({ item, onSave, onDelete }) {
   const [formData, setFormData] = useState({
-    name: item.name,
+    name: item.name || "",
     quantity: item.quantity || 1,
     description: item.description || "",
   });
