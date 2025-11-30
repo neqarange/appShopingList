@@ -1,7 +1,14 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+import { getToken } from "../api";
 
 export default function PrivateRoute({ children }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
+
+  // pokud není validní token = logout
+  if (!user || !getToken()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 }

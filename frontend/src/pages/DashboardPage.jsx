@@ -2,13 +2,24 @@ import { useEffect, useState } from "react";
 import ListCard from "../components/Dashboard/ListCard";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
+import AddListModal from "../components/AddListModal.jsx";
+
+
 
 export default function DashboardPage() {
   const [lists, setLists] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
   const navigate = useNavigate();
 
+  const refreshLists = () => {
+    api.getLists()
+      .then(setLists)
+      .catch(console.error);
+  };
+
   useEffect(() => {
-    api.getLists().then(setLists).catch(console.error);
+    refreshLists();
   }, []);
 
   return (
@@ -17,17 +28,40 @@ export default function DashboardPage() {
         🛒 Nákupní seznamy
       </h1>
 
+      {/* Přidat seznam */}
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+        >
+          + Přidat seznam
+        </button>
+      </div>
+
+      {/* Výpis seznamů */}
       <div className="grid gap-4">
         {lists.map((list) => (
           <ListCard
             key={list._id}
             title={list.name}
-            members={list.sharedWith?.length ? list.sharedWith.map(String) : []}
-            items={(list.items || []).slice(0,3).map(it => ({ name: it.name, isChecked: !!it.bought }))}
+            members={[
+              list.owner?.email,
+              ...(list.sharedWith?.map((u) => u.email) || [])
+            ]}
+            
+            items={[]}   
             onClick={() => navigate(`/detail/${list._id}`)}
           />
         ))}
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <AddListModal
+          onClose={() => setShowModal(false)}
+          onCreated={refreshLists}
+        />
+      )}
     </div>
   );
 }

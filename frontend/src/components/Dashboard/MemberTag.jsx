@@ -1,7 +1,9 @@
 export default function MemberTag({ members }) {
+  const cleanMembers = members.filter(Boolean); // odstraní null / ""
+
   return (
     <div className="flex flex-wrap gap-2 mt-2">
-      {members.map((member, index) => (
+      {cleanMembers.map((member, index) => (
         <span
           key={index}
           className={`px-2 py-1 text-sm rounded-full ${
@@ -14,3 +16,4 @@ export default function MemberTag({ members }) {
     </div>
   );
 }
+

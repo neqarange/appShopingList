@@ -1,61 +1,81 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ItemForm from "../components/Dashboard/Detail/ItemForm";
 import ActionButtons from "../components/Dashboard/Detail/ActionButtons";
 import { api } from "../api";
 
 export default function DetailPage() {
-  const { id } = useParams(); // Mongo _id seznamu
+  const { id } = useParams(); // ID listu z URL
   const navigate = useNavigate();
 
   const [list, setList] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  // načtení seznamu + položek
+  async function loadData() {
+    try {
+      const listData = await api.getList(id);
+      setList(listData);
+
+      const itemsData = await api.getItems(id);
+      setItems(itemsData);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
   useEffect(() => {
-    // načti přehled, najdi aktuální list (kvůli ownerovi a názvu)
-    api.getLists().then(ls => setList(ls.find(l => l._id === id) || null)).catch(console.error);
-    api.getItems(id).then(setItems).catch(console.error);
+    loadData();
   }, [id]);
 
-  const isOwner = useMemo(() => {
-    if (!list) return false;
-    // backend vrací owner jako ObjectId/string – kontrola: je uživatel = owner? (Zjednodušeně: pokud je list ve /api/lists vrácen, UI vypíše tlačítka a back-end stejně práva ohlídá)
-    return true; // UI umožní akci, ale server vynutí práva (403) pokud nejsi owner
-  }, [list]);
-
+  // přidat položku
   async function handleAdd() {
-    const item = await api.addItem(id, "Nová položka");
-    setItems(prev => [item, ...prev]);
+    const item = await api.addItem(id, "Nová položka", "", 1);
+    setItems((prev) => [item, ...prev]);
   }
 
+  // zakoupeno / nezakoupeno
   async function toggleBought(item) {
     const updated = await api.setBought(id, item._id, !item.bought);
-    setItems(prev => prev.map(x => x._id === item._id ? updated : x));
+    setItems((prev) =>
+      prev.map((x) => (x._id === item._id ? updated : x))
+    );
   }
 
+  // archivace položky
   async function archiveItem(it) {
     try {
       const updated = await api.archiveItem(id, it._id);
-      setItems(prev => prev.map(x => x._id === it._id ? updated : x));
+      setItems((prev) =>
+        prev.map((x) => (x._id === it._id ? updated : x))
+      );
       setSelectedItem(null);
     } catch (e) {
       alert(e.message);
     }
   }
 
-  function handleSave(updatedFromForm) {
-    // Backend nemá endpoint na přejmenování položky/poznámku/quantity (MVP).
-    // Zachováme lokálně název – volitelně by se dal přidat PUT endpoint.
-    setItems(prev =>
-      prev.map((item) => item._id === selectedItem._id
-        ? { ...item, name: updatedFromForm.name }
-        : item
-      )
-    );
-    setSelectedItem(null);
+  // uložit změny položky
+  async function handleSave(updatedFromForm) {
+    try {
+      const updated = await api.updateItem(id, updatedFromForm._id, {
+        name: updatedFromForm.name,
+        description: updatedFromForm.description,
+        quantity: updatedFromForm.quantity
+      });
+
+      setItems((prev) =>
+        prev.map((i) => (i._id === updated._id ? updated : i))
+      );
+
+      setSelectedItem(null);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
+  // smazat list
   async function handleDeleteList() {
     try {
       await api.deleteList(id);
@@ -65,6 +85,7 @@ export default function DetailPage() {
     }
   }
 
+  // archivovat list
   async function handleArchiveList() {
     try {
       const updated = await api.archiveList(id);
@@ -77,7 +98,10 @@ export default function DetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline mb-4">
+      <button
+        onClick={() => navigate(-1)}
+        className="text-blue-600 hover:underline mb-4"
+      >
         ← Zpět
       </button>
 
@@ -85,6 +109,7 @@ export default function DetailPage() {
         {list?.name || "Seznam"}
       </h1>
 
+      {/* Výpis položek */}
       <div className="space-y-2 mb-8">
         {items.map((item) => (
           <div
@@ -95,6 +120,7 @@ export default function DetailPage() {
             <span className={`${item.bought ? "line-through text-gray-400" : ""}`}>
               {item.name}
             </span>
+
             <input
               type="checkbox"
               checked={!!item.bought}
@@ -105,18 +131,20 @@ export default function DetailPage() {
         ))}
       </div>
 
+      {/* Detail položky */}
       {selectedItem && (
         <ItemForm
-          item={{ ...selectedItem, isChecked: selectedItem.bought }}
+          item={selectedItem}
           onSave={handleSave}
           onDelete={() => archiveItem(selectedItem)}
         />
       )}
 
+      {/* Tlačítka dole */}
       <ActionButtons
-        onSave={handleArchiveList}     // použijeme jako „Archivovat seznam“ (owner rozhodne backend)
-        onDelete={handleDeleteList}    // smazání seznamu
-        onAdd={handleAdd}              // přidání položky
+        onSave={handleArchiveList}
+        onDelete={handleDeleteList}
+        onAdd={handleAdd}
       />
     </div>
   );
