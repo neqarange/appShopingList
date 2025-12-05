@@ -3,16 +3,19 @@ import { useEffect, useState } from "react";
 import ItemForm from "../components/Dashboard/Detail/ItemForm";
 import ActionButtons from "../components/Dashboard/Detail/ActionButtons";
 import { api } from "../api";
+import { useAuth } from "../auth/AuthContext";
 
 export default function DetailPage() {
-  const { id } = useParams(); // ID listu z URL
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [list, setList] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // načtení seznamu + položek
+  const isOwner = list?.owner?.email === user?.email;
+
   async function loadData() {
     try {
       const listData = await api.getList(id);
@@ -29,40 +32,32 @@ export default function DetailPage() {
     loadData();
   }, [id]);
 
-  // přidat položku
   async function handleAdd() {
     const item = await api.addItem(id, "Nová položka", "", 1);
     setItems((prev) => [item, ...prev]);
   }
 
-  // zakoupeno / nezakoupeno
   async function toggleBought(item) {
     const updated = await api.setBought(id, item._id, !item.bought);
-    setItems((prev) =>
-      prev.map((x) => (x._id === item._id ? updated : x))
-    );
+    setItems((prev) => prev.map((x) => (x._id === item._id ? updated : x)));
   }
 
-  // archivace položky
   async function archiveItem(it) {
     try {
       const updated = await api.archiveItem(id, it._id);
-      setItems((prev) =>
-        prev.map((x) => (x._id === it._id ? updated : x))
-      );
+      setItems((prev) => prev.map((x) => (x._id === it._id ? updated : x)));
       setSelectedItem(null);
     } catch (e) {
       alert(e.message);
     }
   }
 
-  // uložit změny položky
   async function handleSave(updatedFromForm) {
     try {
       const updated = await api.updateItem(id, updatedFromForm._id, {
         name: updatedFromForm.name,
         description: updatedFromForm.description,
-        quantity: updatedFromForm.quantity
+        quantity: updatedFromForm.quantity,
       });
 
       setItems((prev) =>
@@ -75,7 +70,6 @@ export default function DetailPage() {
     }
   }
 
-  // smazat list
   async function handleDeleteList() {
     try {
       await api.deleteList(id);
@@ -85,27 +79,26 @@ export default function DetailPage() {
     }
   }
 
-  // archivovat list
   async function handleArchiveList() {
     try {
       const updated = await api.archiveList(id);
       setList(updated);
-      alert("Seznam archivován");
+      alert("Seznam archivován.");
     } catch (e) {
       alert(e.message);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-900 dark:text-gray-100 transition-colors">
       <button
         onClick={() => navigate(-1)}
-        className="text-blue-600 hover:underline mb-4"
+        className="text-blue-600 dark:text-blue-300 hover:underline mb-4"
       >
         ← Zpět
       </button>
 
-      <h1 className="text-2xl font-bold mb-6 text-center text-blue-700">
+      <h1 className="text-2xl font-bold mb-6 text-center">
         {list?.name || "Seznam"}
       </h1>
 
@@ -115,7 +108,12 @@ export default function DetailPage() {
           <div
             key={item._id}
             onClick={() => setSelectedItem(item)}
-            className="p-3 bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer flex justify-between items-center"
+            className="
+              p-3 bg-white dark:bg-gray-800 
+              rounded-xl shadow 
+              hover:shadow-md transition cursor-pointer 
+              flex justify-between items-center
+            "
           >
             <span className={`${item.bought ? "line-through text-gray-400" : ""}`}>
               {item.name}
@@ -140,12 +138,13 @@ export default function DetailPage() {
         />
       )}
 
-      {/* Tlačítka dole */}
+      {/* Ovládací tlačítka */}
       <ActionButtons
-        onSave={handleArchiveList}
-        onDelete={handleDeleteList}
+        onSave={isOwner ? handleArchiveList : undefined}
+        onDelete={isOwner ? handleDeleteList : undefined}
         onAdd={handleAdd}
       />
     </div>
   );
 }
+

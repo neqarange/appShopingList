@@ -4,11 +4,9 @@ import { api } from "../api";
 export default function AddListModal({ onClose, onCreated }) {
   const [name, setName] = useState("");
 
-  // Sharing
   const [email, setEmail] = useState("");
   const [shared, setShared] = useState([]);
 
-  // Items
   const [items, setItems] = useState([]);
 
   const addItem = () => {
@@ -55,15 +53,12 @@ export default function AddListModal({ onClose, onCreated }) {
     }
 
     try {
-      // 1) Create main list
       const list = await api.createList(name);
 
-      // 2) Add shared users
       for (const userEmail of shared) {
         await api.shareList(list._id, userEmail);
       }
 
-      // 3) Add items to DB
       for (const it of items) {
         if (!it.name.trim()) continue;
 
@@ -75,7 +70,6 @@ export default function AddListModal({ onClose, onCreated }) {
         );
       }
 
-      // 4) Refresh dashboard + close modal
       onCreated();
       onClose();
     } catch (err) {
@@ -84,16 +78,18 @@ export default function AddListModal({ onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center p-4 z-50">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl space-y-6">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex justify-center items-center p-4 z-50 transition-colors">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl space-y-6 transition-colors">
 
-        <h2 className="text-2xl font-bold text-center">Přidat seznam</h2>
+        <h2 className="text-2xl font-bold text-center dark:text-white">
+          Přidat seznam
+        </h2>
 
         {/* Název */}
         <div>
-          <label className="font-medium">Název seznamu</label>
+          <label className="font-medium dark:text-gray-200">Název seznamu</label>
           <input
-            className="w-full border rounded p-2 mt-1"
+            className="w-full border rounded p-2 mt-1 bg-white dark:bg-gray-700 dark:text-gray-100"
             placeholder="Např. Víkendový nákup"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -102,10 +98,10 @@ export default function AddListModal({ onClose, onCreated }) {
 
         {/* Sdílení */}
         <div>
-          <label className="font-medium">Přidej uživatele</label>
+          <label className="font-medium dark:text-gray-200">Přidej uživatele</label>
           <div className="flex gap-2 mt-1">
             <input
-              className="flex-1 border rounded p-2"
+              className="flex-1 border rounded p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
               placeholder="Email uživatele"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -119,7 +115,7 @@ export default function AddListModal({ onClose, onCreated }) {
           </div>
 
           {shared.length > 0 && (
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
               Sdíleno: {shared.join(", ")}
             </p>
           )}
@@ -127,18 +123,18 @@ export default function AddListModal({ onClose, onCreated }) {
 
         {/* Položky */}
         <div className="space-y-4">
-          <label className="font-medium">Položky</label>
+          <label className="font-medium dark:text-gray-200">Položky</label>
 
           {items.map((item) =>
             item.isOpen ? (
               <div
                 key={item.id}
-                className="p-4 bg-gray-100 rounded-xl shadow-inner space-y-3"
+                className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl shadow-inner space-y-3"
               >
                 <div>
-                  <label className="text-sm font-medium">Název</label>
+                  <label className="text-sm font-medium dark:text-gray-200">Název</label>
                   <input
-                    className="w-full border rounded p-2"
+                    className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
                     value={item.name}
                     onChange={(e) =>
                       updateItem(item.id, { name: e.target.value })
@@ -147,9 +143,9 @@ export default function AddListModal({ onClose, onCreated }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Popis</label>
+                  <label className="text-sm font-medium dark:text-gray-200">Popis</label>
                   <textarea
-                    className="w-full border rounded p-2"
+                    className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
                     value={item.description}
                     onChange={(e) =>
                       updateItem(item.id, { description: e.target.value })
@@ -158,10 +154,10 @@ export default function AddListModal({ onClose, onCreated }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Množství</label>
+                  <label className="text-sm font-medium dark:text-gray-200">Množství</label>
                   <div className="flex items-center gap-3">
                     <button
-                      className="px-3 py-1 bg-gray-300 rounded"
+                      className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
                       onClick={() =>
                         updateItem(item.id, {
                           quantity: Math.max(1, item.quantity - 1),
@@ -170,9 +166,9 @@ export default function AddListModal({ onClose, onCreated }) {
                     >
                       -
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="text-gray-800 dark:text-gray-100">{item.quantity}</span>
                     <button
-                      className="px-3 py-1 bg-gray-300 rounded"
+                      className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
                       onClick={() =>
                         updateItem(item.id, { quantity: item.quantity + 1 })
                       }
@@ -185,7 +181,7 @@ export default function AddListModal({ onClose, onCreated }) {
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     onClick={() => cancelItem(item.id)}
-                    className="px-4 py-2 bg-gray-300 rounded-lg"
+                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 dark:text-gray-100 rounded-lg"
                   >
                     Zrušit
                   </button>
@@ -200,11 +196,13 @@ export default function AddListModal({ onClose, onCreated }) {
             ) : (
               <div
                 key={item.id}
-                className="p-3 bg-gray-100 rounded-xl shadow flex justify-between items-center"
+                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl shadow flex justify-between items-center"
               >
                 <div>
-                  <p className="font-medium">{item.name || "Položka"}</p>
-                  <p className="text-xs text-gray-500">{item.quantity} ks</p>
+                  <p className="font-medium dark:text-white">{item.name || "Položka"}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-300">
+                    {item.quantity} ks
+                  </p>
                 </div>
 
                 <button
@@ -220,7 +218,7 @@ export default function AddListModal({ onClose, onCreated }) {
           <div className="flex justify-center">
             <button
               onClick={addItem}
-              className="w-10 h-10 bg-black text-white rounded-full text-xl flex items-center justify-center"
+              className="w-10 h-10 bg-black dark:bg-gray-600 text-white rounded-full text-xl flex items-center justify-center"
             >
               +
             </button>
@@ -234,7 +232,7 @@ export default function AddListModal({ onClose, onCreated }) {
           Uložit
         </button>
 
-        <button onClick={onClose} className="w-full py-2 text-center">
+        <button onClick={onClose} className="w-full py-2 text-center dark:text-gray-200">
           Zrušit
         </button>
       </div>
