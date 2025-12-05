@@ -19,24 +19,30 @@ export default function ItemForm({ item, onSave, onDelete }) {
   };
 
   return (
-    <div className="p-4 bg-white rounded-2xl shadow mt-6 space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700">Detail položky</h3>
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow mt-6 space-y-4 transition-colors">
+      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
+        Detail položky
+      </h3>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Název</label>
+        <label className="block text-sm font-medium dark:text-gray-200">
+          Název
+        </label>
         <input
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full border rounded-lg p-2"
+          className="w-full border rounded-lg p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
         />
 
-        <label className="block text-sm font-medium">Popis</label>
+        <label className="block text-sm font-medium dark:text-gray-200">
+          Popis
+        </label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="w-full border rounded-lg p-2"
+          className="w-full border rounded-lg p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
         />
 
         <QuantitySelector
