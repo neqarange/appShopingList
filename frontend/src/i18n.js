@@ -2,6 +2,10 @@ export const translations = {
   cs: {
     // Dashboard
     title: "Nákupní seznamy",
+    archivedLists: "Archivované seznamy",
+    active: "Aktivní",
+    archived: "Archivované",
+
     addList: "Přidat seznam",
     darkMode: "Tmavý režim",
     lightMode: "Světlý režim",
@@ -33,13 +37,15 @@ export const translations = {
     // ActionButtons
     saveList: "Uložit seznam",
     deleteList: "Smazat seznam",
-    addItem: "Přidat položku",
-    archiveList: "Archivovat seznam",
   },
 
   en: {
     // Dashboard
     title: "Shopping Lists",
+    archivedLists: "Archived Lists",
+    active: "Active",
+    archived: "Archived",
+
     addList: "Add List",
     darkMode: "Dark mode",
     lightMode: "Light mode",
@@ -52,7 +58,7 @@ export const translations = {
     addItem: "Add item",
 
     // ItemForm
-    itemDetail: "Item details",
+    itemDetail: "Item Detail",
     name: "Name",
     description: "Description",
     quantity: "Quantity",
@@ -71,8 +77,7 @@ export const translations = {
     // ActionButtons
     saveList: "Save list",
     deleteList: "Delete list",
-    addItem: "Add item",
-    archiveList: "Archive list",
   },
 };
+
 

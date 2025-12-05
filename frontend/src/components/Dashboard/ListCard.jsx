@@ -1,36 +1,28 @@
 import ListItem from "./ListItem";
 import MemberTag from "./MemberTag";
 
-export default function ListCard({ title, members, items, onClick }) {
+export default function ListCard({ title, members, items, onClick, archived }) {
   return (
     <div
       onClick={onClick}
-      className="
-        p-4 
-        bg-white dark:bg-gray-800 
-        rounded-2xl 
-        shadow hover:shadow-lg 
-        cursor-pointer transition
-      "
+      className={`p-4 rounded-xl shadow bg-white dark:bg-gray-800 cursor-pointer transition 
+        ${archived ? "opacity-50 hover:opacity-70" : "hover:shadow-md"}`}
     >
-      {/* Název seznamu */}
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      <h2 className="text-xl font-semibold dark:text-white">
         {title}
       </h2>
 
-      {/* Tagy uživatelů */}
-      <MemberTag members={members} />
-
-      {/* Náhled položek (prázdné zatím, protože backend to neposílá) */}
-      <div className="mt-3 space-y-1">
-        {items.slice(0, 3).map((item, index) => (
-          <ListItem
-            key={index}
-            name={item.name}
-            isChecked={item.isChecked}
-          />
+      <div className="flex gap-2 mt-2 flex-wrap">
+        {members.map((m, i) => (
+          <span
+            key={i}
+            className="px-2 py-1 text-sm bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white rounded"
+          >
+            {m}
+          </span>
         ))}
       </div>
     </div>
   );
 }
+
