@@ -2,31 +2,33 @@ import { useState } from "react";
 import QuantitySelector from "./QuantitySelector";
 import DeleteItem from "./DeleteItem";
 import SaveNewItem from "./SaveNewItem";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 export default function ItemForm({ item, onSave, onDelete }) {
+  const { t } = useLanguage();
+
   const [formData, setFormData] = useState({
     name: item.name || "",
     quantity: item.quantity || 1,
     description: item.description || "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  const handleSave = () => {
-    onSave({ ...item, ...formData });
-  };
+  const handleSave = () => onSave({ ...item, ...formData });
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow mt-6 space-y-4 transition-colors">
+
       <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
-        Detail položky
+        {t.itemDetail}
       </h3>
 
       <div className="space-y-2">
+
         <label className="block text-sm font-medium dark:text-gray-200">
-          Název
+          {t.name}
         </label>
         <input
           name="name"
@@ -36,7 +38,7 @@ export default function ItemForm({ item, onSave, onDelete }) {
         />
 
         <label className="block text-sm font-medium dark:text-gray-200">
-          Popis
+          {t.description}
         </label>
         <textarea
           name="description"
@@ -44,6 +46,10 @@ export default function ItemForm({ item, onSave, onDelete }) {
           onChange={handleChange}
           className="w-full border rounded-lg p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
         />
+
+        <label className="block text-sm font-medium dark:text-gray-200">
+          {t.quantity}
+        </label>
 
         <QuantitySelector
           value={formData.quantity}
@@ -60,8 +66,8 @@ export default function ItemForm({ item, onSave, onDelete }) {
       </div>
 
       <div className="flex justify-between">
-        <DeleteItem onClick={onDelete} />
-        <SaveNewItem onClick={handleSave} />
+        <DeleteItem onClick={onDelete} label={t.deleteItem} />
+        <SaveNewItem onClick={handleSave} label={t.saveItem} />
       </div>
     </div>
   );

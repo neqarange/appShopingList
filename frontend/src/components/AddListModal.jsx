@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { api } from "../api";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function AddListModal({ onClose, onCreated }) {
-  const [name, setName] = useState("");
+  const { t } = useLanguage();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [shared, setShared] = useState([]);
-
   const [items, setItems] = useState([]);
 
   const addItem = () => {
@@ -26,48 +27,32 @@ export default function AddListModal({ onClose, onCreated }) {
     setItems(items.map((i) => (i.id === id ? { ...i, ...changes } : i)));
   };
 
-  const saveItem = (id) => {
-    updateItem(id, { isOpen: false });
-  };
+  const saveItem = (id) => updateItem(id, { isOpen: false });
 
   const cancelItem = (id) => {
     const it = items.find((i) => i.id === id);
     if (!it.name.trim() && !it.description.trim()) {
       setItems(items.filter((i) => i.id !== id));
-    } else {
-      updateItem(id, { isOpen: false });
-    }
+    } else updateItem(id, { isOpen: false });
   };
 
   const addSharedUser = () => {
     if (!email.trim()) return;
-    if (!shared.includes(email.trim())) {
-      setShared([...shared, email.trim()]);
-    }
+    if (!shared.includes(email.trim())) setShared([...shared, email.trim()]);
     setEmail("");
   };
 
   const saveList = async () => {
-    if (!name.trim()) {
-      return alert("Zadej název seznamu.");
-    }
+    if (!name.trim()) return alert("Missing name");
 
     try {
       const list = await api.createList(name);
 
-      for (const userEmail of shared) {
-        await api.shareList(list._id, userEmail);
-      }
+      for (const userEmail of shared) await api.shareList(list._id, userEmail);
 
       for (const it of items) {
         if (!it.name.trim()) continue;
-
-        await api.addItem(
-          list._id,
-          it.name,
-          it.description,
-          it.quantity
-        );
+        await api.addItem(list._id, it.name, it.description, it.quantity);
       }
 
       onCreated();
@@ -78,19 +63,18 @@ export default function AddListModal({ onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex justify-center items-center p-4 z-50 transition-colors">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl space-y-6 transition-colors">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex justify-center items-center p-4 z-50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl space-y-6">
 
         <h2 className="text-2xl font-bold text-center dark:text-white">
-          Přidat seznam
+          {t.addListTitle}
         </h2>
 
-        {/* Název */}
+        {/* Název seznamu */}
         <div>
-          <label className="font-medium dark:text-gray-200">Název seznamu</label>
+          <label className="font-medium dark:text-gray-200">{t.listName}</label>
           <input
             className="w-full border rounded p-2 mt-1 bg-white dark:bg-gray-700 dark:text-gray-100"
-            placeholder="Např. Víkendový nákup"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -98,11 +82,10 @@ export default function AddListModal({ onClose, onCreated }) {
 
         {/* Sdílení */}
         <div>
-          <label className="font-medium dark:text-gray-200">Přidej uživatele</label>
+          <label className="font-medium dark:text-gray-200">{t.shareUser}</label>
           <div className="flex gap-2 mt-1">
             <input
               className="flex-1 border rounded p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
-              placeholder="Email uživatele"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -116,23 +99,25 @@ export default function AddListModal({ onClose, onCreated }) {
 
           {shared.length > 0 && (
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-              Sdíleno: {shared.join(", ")}
+              {t.sharedWith}: {shared.join(", ")}
             </p>
           )}
         </div>
 
         {/* Položky */}
         <div className="space-y-4">
-          <label className="font-medium dark:text-gray-200">Položky</label>
+          <label className="font-medium dark:text-gray-200">{t.items}</label>
 
           {items.map((item) =>
             item.isOpen ? (
               <div
                 key={item.id}
-                className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl shadow-inner space-y-3"
+                className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl space-y-3"
               >
                 <div>
-                  <label className="text-sm font-medium dark:text-gray-200">Název</label>
+                  <label className="text-sm font-medium dark:text-gray-200">
+                    {t.name}
+                  </label>
                   <input
                     className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
                     value={item.name}
@@ -143,7 +128,9 @@ export default function AddListModal({ onClose, onCreated }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium dark:text-gray-200">Popis</label>
+                  <label className="text-sm font-medium dark:text-gray-200">
+                    {t.description}
+                  </label>
                   <textarea
                     className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
                     value={item.description}
@@ -154,7 +141,10 @@ export default function AddListModal({ onClose, onCreated }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium dark:text-gray-200">Množství</label>
+                  <label className="text-sm font-medium dark:text-gray-200">
+                    {t.quantity}
+                  </label>
+
                   <div className="flex items-center gap-3">
                     <button
                       className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
@@ -166,7 +156,9 @@ export default function AddListModal({ onClose, onCreated }) {
                     >
                       -
                     </button>
-                    <span className="text-gray-800 dark:text-gray-100">{item.quantity}</span>
+
+                    <span className="dark:text-gray-100">{item.quantity}</span>
+
                     <button
                       className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
                       onClick={() =>
@@ -178,28 +170,28 @@ export default function AddListModal({ onClose, onCreated }) {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-2">
+                <div className="flex justify-end gap-3">
                   <button
                     onClick={() => cancelItem(item.id)}
                     className="px-4 py-2 bg-gray-300 dark:bg-gray-600 dark:text-gray-100 rounded-lg"
                   >
-                    Zrušit
+                    {t.cancel}
                   </button>
                   <button
                     onClick={() => saveItem(item.id)}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg"
                   >
-                    Uložit položku
+                    {t.saveItem}
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 key={item.id}
-                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl shadow flex justify-between items-center"
+                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl flex justify-between items-center"
               >
                 <div>
-                  <p className="font-medium dark:text-white">{item.name || "Položka"}</p>
+                  <p className="font-medium dark:text-white">{item.name || t.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-300">
                     {item.quantity} ks
                   </p>
@@ -229,14 +221,16 @@ export default function AddListModal({ onClose, onCreated }) {
           onClick={saveList}
           className="w-full py-2 bg-green-600 text-white rounded-xl"
         >
-          Uložit
+          {t.saveList}
         </button>
 
-        <button onClick={onClose} className="w-full py-2 text-center dark:text-gray-200">
-          Zrušit
+        <button
+          onClick={onClose}
+          className="w-full py-2 text-center dark:text-gray-200"
+        >
+          {t.cancel}
         </button>
       </div>
     </div>
   );
 }
-
