@@ -43,7 +43,7 @@ export default function AddListModal({ onClose, onCreated }) {
   };
 
   const saveList = async () => {
-    if (!name.trim()) return alert("Missing name");
+    if (!name.trim()) return alert(t.listName + " missing");
 
     try {
       const list = await api.createList(name);
@@ -63,173 +63,197 @@ export default function AddListModal({ onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex justify-center items-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl space-y-6">
+    <div className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md flex justify-center items-center p-4 z-50 animate-fadeIn">
 
-        <h2 className="text-2xl font-bold text-center dark:text-white">
-          {t.addListTitle}
-        </h2>
+      {/* MODAL CARD */}
+      <div className="w-full max-w-xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden animate-slideUp">
 
-        {/* Název seznamu */}
-        <div>
-          <label className="font-medium dark:text-gray-200">{t.listName}</label>
-          <input
-            className="w-full border rounded p-2 mt-1 bg-white dark:bg-gray-700 dark:text-gray-100"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+        {/* HEADER */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
+            {t.addListTitle}
+          </h2>
         </div>
 
-        {/* Sdílení */}
-        <div>
-          <label className="font-medium dark:text-gray-200">{t.shareUser}</label>
-          <div className="flex gap-2 mt-1">
+        <div className="p-6 space-y-6">
+
+          {/* LIST NAME */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
+              {t.listName}
+            </label>
             <input
-              className="flex-1 border rounded p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none transition"
+              placeholder="Shopping for weekend…"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            <button
-              onClick={addSharedUser}
-              className="px-4 bg-blue-600 text-white rounded"
-            >
-              +
-            </button>
           </div>
 
-          {shared.length > 0 && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-              {t.sharedWith}: {shared.join(", ")}
-            </p>
-          )}
-        </div>
-
-        {/* Položky */}
-        <div className="space-y-4">
-          <label className="font-medium dark:text-gray-200">{t.items}</label>
-
-          {items.map((item) =>
-            item.isOpen ? (
-              <div
-                key={item.id}
-                className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl space-y-3"
+          {/* SHARED USERS */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
+              {t.shareUser}
+            </label>
+            <div className="flex gap-2">
+              <input
+                className="flex-1 p-3 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                onClick={addSharedUser}
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white shadow hover:bg-blue-700 transition"
               >
-                <div>
-                  <label className="text-sm font-medium dark:text-gray-200">
-                    {t.name}
-                  </label>
-                  <input
-                    className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
-                    value={item.name}
-                    onChange={(e) =>
-                      updateItem(item.id, { name: e.target.value })
-                    }
-                  />
-                </div>
+                +
+              </button>
+            </div>
 
-                <div>
-                  <label className="text-sm font-medium dark:text-gray-200">
-                    {t.description}
-                  </label>
-                  <textarea
-                    className="w-full border rounded p-2 bg-white dark:bg-gray-600 dark:text-gray-100"
-                    value={item.description}
-                    onChange={(e) =>
-                      updateItem(item.id, { description: e.target.value })
-                    }
-                  />
-                </div>
+            {shared.length > 0 && (
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                {t.sharedWith}: {shared.join(", ")}
+              </p>
+            )}
+          </div>
 
-                <div>
-                  <label className="text-sm font-medium dark:text-gray-200">
-                    {t.quantity}
-                  </label>
+          {/* ITEMS */}
+          <div className="space-y-3">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium">
+              {t.items}
+            </label>
 
-                  <div className="flex items-center gap-3">
-                    <button
-                      className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
-                      onClick={() =>
-                        updateItem(item.id, {
-                          quantity: Math.max(1, item.quantity - 1),
-                        })
+            {items.map((item) =>
+              item.isOpen ? (
+                <div
+                  key={item.id}
+                  className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl shadow-inner space-y-3 animate-slideUp"
+                >
+                  {/* NAME */}
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">
+                      {t.name}
+                    </label>
+                    <input
+                      className="w-full p-3 rounded-xl bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                      value={item.name}
+                      onChange={(e) =>
+                        updateItem(item.id, { name: e.target.value })
                       }
+                    />
+                  </div>
+
+                  {/* DESCRIPTION */}
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">
+                      {t.description}
+                    </label>
+                    <textarea
+                      className="w-full p-3 rounded-xl bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                      value={item.description}
+                      onChange={(e) =>
+                        updateItem(item.id, { description: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  {/* QUANTITY */}
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">
+                      {t.quantity}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded-lg"
+                        onClick={() =>
+                          updateItem(item.id, {
+                            quantity: Math.max(1, item.quantity - 1),
+                          })
+                        }
+                      >
+                        -
+                      </button>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {item.quantity}
+                      </span>
+                      <button
+                        className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded-lg"
+                        onClick={() =>
+                          updateItem(item.id, { quantity: item.quantity + 1 })
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => cancelItem(item.id)}
+                      className="px-4 py-2 rounded-xl bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500 transition"
                     >
-                      -
+                      {t.cancel}
                     </button>
-
-                    <span className="dark:text-gray-100">{item.quantity}</span>
-
                     <button
-                      className="px-3 py-1 bg-gray-300 dark:bg-gray-500 rounded"
-                      onClick={() =>
-                        updateItem(item.id, { quantity: item.quantity + 1 })
-                      }
+                      onClick={() => saveItem(item.id)}
+                      className="px-4 py-2 rounded-xl bg-green-600 text-white shadow hover:bg-green-700 transition"
                     >
-                      +
+                      {t.saveItem}
                     </button>
                   </div>
                 </div>
-
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => cancelItem(item.id)}
-                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 dark:text-gray-100 rounded-lg"
-                  >
-                    {t.cancel}
-                  </button>
-                  <button
-                    onClick={() => saveItem(item.id)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg"
-                  >
-                    {t.saveItem}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div
-                key={item.id}
-                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-medium dark:text-white">{item.name || t.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-300">
-                    {item.quantity} ks
-                  </p>
-                </div>
-
-                <button
-                  className="px-3 py-1 bg-cyan-500 text-white rounded"
-                  onClick={() => updateItem(item.id, { isOpen: true })}
+              ) : (
+                <div
+                  key={item.id}
+                  className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl shadow flex justify-between items-center"
                 >
-                  Detail
-                </button>
-              </div>
-            )
-          )}
+                  <div>
+                    <p className="font-medium dark:text-white">
+                      {item.name || t.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-300">
+                      {item.quantity} ks
+                    </p>
+                  </div>
 
-          <div className="flex justify-center">
-            <button
-              onClick={addItem}
-              className="w-10 h-10 bg-black dark:bg-gray-600 text-white rounded-full text-xl flex items-center justify-center"
-            >
-              +
-            </button>
+                  <button
+                    className="px-3 py-1 bg-blue-500 text-white rounded-lg shadow"
+                    onClick={() => updateItem(item.id, { isOpen: true })}
+                  >
+                    Detail
+                  </button>
+                </div>
+              )
+            )}
+
+            {/* ADD NEW ITEM */}
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={addItem}
+                className="w-12 h-12 rounded-full bg-blue-600 text-white text-3xl shadow-md hover:scale-110 active:scale-95 transition"
+              >
+                +
+              </button>
+            </div>
           </div>
+
+          {/* SAVE LIST BUTTON */}
+          <button
+            onClick={saveList}
+            className="w-full py-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition text-lg font-semibold"
+          >
+            {t.saveList}
+          </button>
+
+          {/* CANCEL */}
+          <button
+            onClick={onClose}
+            className="w-full py-2 text-center text-gray-700 dark:text-gray-200 hover:underline"
+          >
+            {t.cancel}
+          </button>
         </div>
-
-        <button
-          onClick={saveList}
-          className="w-full py-2 bg-green-600 text-white rounded-xl"
-        >
-          {t.saveList}
-        </button>
-
-        <button
-          onClick={onClose}
-          className="w-full py-2 text-center dark:text-gray-200"
-        >
-          {t.cancel}
-        </button>
       </div>
     </div>
   );
