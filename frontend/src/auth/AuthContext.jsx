@@ -5,20 +5,46 @@ const AuthCtx = createContext();
 export const useAuth = () => useContext(AuthCtx);
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+
+  // Load session on startup
+  useEffect(() => {
     const token = getToken();
-    const saved = localStorage.getItem("user");
-    return token && saved ? JSON.parse(saved) : null;
-  });
+    const storedUser = localStorage.getItem("user");
 
+    if (token && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
+
+  // LOGIN
   const login = async (email, password) => {
-    const { token, user } = await api.login(email, password);
+    try {
+      const { token, user } = await api.login(email, password);
 
-    setToken(token);
-    setUser(user);
-    localStorage.setItem("user", JSON.stringify(user));
+      if (!token || !user) throw new Error("Invalid login response");
+
+      setToken(token);
+
+      const formattedUser = {
+        _id: user._id,
+        email: user.email,
+        name: user.name || "",
+        surename: user.surename || "",
+      };
+
+      setUser(formattedUser);
+      localStorage.setItem("user", JSON.stringify(formattedUser));
+    } catch (err) {
+      throw err;
+    }
   };
 
+  // LOGOUT
   const logout = () => {
     clearToken();
     setUser(null);
@@ -29,3 +55,5 @@ export default function AuthProvider({ children }) {
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
+
+
