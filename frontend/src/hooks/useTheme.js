@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
-export function useTheme() {
+const ThemeContext = createContext();
+export const useTheme = () => useContext(ThemeContext);
+
+export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "light"
   );
 
   useEffect(() => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
     localStorage.setItem("theme", theme);
-
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
   }, [theme]);
 
-  return { theme, setTheme };
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
