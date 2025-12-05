@@ -4,17 +4,20 @@ import ItemForm from "../components/Dashboard/Detail/ItemForm";
 import ActionButtons from "../components/Dashboard/Detail/ActionButtons";
 import { api } from "../api";
 import { useAuth } from "../auth/AuthContext";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function DetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [list, setList] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const isOwner = list?.owner?.email === user?.email;
+ 
+  const isOwner = list?.owner?._id === user?._id;
 
   async function loadData() {
     try {
@@ -33,7 +36,7 @@ export default function DetailPage() {
   }, [id]);
 
   async function handleAdd() {
-    const item = await api.addItem(id, "Nová položka", "", 1);
+    const item = await api.addItem(id, "New item", "", 1);
     setItems((prev) => [item, ...prev]);
   }
 
@@ -44,30 +47,30 @@ export default function DetailPage() {
 
   async function archiveItem(it) {
     try {
-      const updated = await api.archiveItem(id, it._id);
-      setItems((prev) => prev.map((x) => (x._id === it._id ? updated : x)));
+      await api.archiveItem(id, it._id);
+      setItems((prev) => prev.map((x) => (x._id === it._id ? { ...x, archived: true } : x)));
       setSelectedItem(null);
     } catch (e) {
       alert(e.message);
     }
   }
 
-  async function handleSave(updatedFromForm) {
+  async function handleSave(updated) {
     try {
-      const updated = await api.updateItem(id, updatedFromForm._id, {
-        name: updatedFromForm.name,
-        description: updatedFromForm.description,
-        quantity: updatedFromForm.quantity,
-      });
+      const saved = await api.updateItem(id, updated._id, updated);
 
       setItems((prev) =>
-        prev.map((i) => (i._id === updated._id ? updated : i))
+        prev.map((i) => (i._id === saved._id ? saved : i))
       );
 
       setSelectedItem(null);
     } catch (e) {
       alert(e.message);
     }
+  }
+
+  async function handleSaveList() {
+    alert("Saving list is not implemented yet");
   }
 
   async function handleDeleteList() {
@@ -81,25 +84,26 @@ export default function DetailPage() {
 
   async function handleArchiveList() {
     try {
-      const updated = await api.archiveList(id);
-      setList(updated);
-      alert("Seznam archivován.");
+      await api.archiveList(id);
+      alert("List archived");
+      navigate("/");
     } catch (e) {
       alert(e.message);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-900 dark:text-gray-100">
+
       <button
         onClick={() => navigate(-1)}
         className="text-blue-600 dark:text-blue-300 hover:underline mb-4"
       >
-        ← Zpět
+        ← {t.back}
       </button>
 
       <h1 className="text-2xl font-bold mb-6 text-center">
-        {list?.name || "Seznam"}
+        {list?.name || ""}
       </h1>
 
       {/* Výpis položek */}
@@ -108,14 +112,9 @@ export default function DetailPage() {
           <div
             key={item._id}
             onClick={() => setSelectedItem(item)}
-            className="
-              p-3 bg-white dark:bg-gray-800 
-              rounded-xl shadow 
-              hover:shadow-md transition cursor-pointer 
-              flex justify-between items-center
-            "
+            className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-md transition cursor-pointer flex justify-between items-center"
           >
-            <span className={`${item.bought ? "line-through text-gray-400" : ""}`}>
+            <span className={`${item.bought ? "line-through text-gray-400" : "dark:text-white"}`}>
               {item.name}
             </span>
 
@@ -129,7 +128,6 @@ export default function DetailPage() {
         ))}
       </div>
 
-      {/* Detail položky */}
       {selectedItem && (
         <ItemForm
           item={selectedItem}
@@ -138,11 +136,10 @@ export default function DetailPage() {
         />
       )}
 
-      {/* Ovládací tlačítka */}
       <ActionButtons
+        onAdd={handleAdd}
         onSave={isOwner ? handleArchiveList : undefined}
         onDelete={isOwner ? handleDeleteList : undefined}
-        onAdd={handleAdd}
       />
     </div>
   );

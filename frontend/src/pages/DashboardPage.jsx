@@ -4,11 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import AddListModal from "../components/AddListModal.jsx";
 import { useTheme } from "../hooks/useTheme";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function DashboardPage() {
   const [lists, setLists] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
   const { theme, setTheme } = useTheme();
+  const { lang, t, changeLang } = useLanguage();
+
   const navigate = useNavigate();
 
   const refreshLists = () => {
@@ -24,41 +28,42 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 transition-colors">
 
-      {/* 1) Titulek */}
+      {/* 1) Nadpis */}
       <h1 className="text-3xl font-bold text-blue-700 dark:text-white mb-4">
-        🛒 Nákupní seznamy
+        🛒 {t.title}
       </h1>
 
-      {/* 2) Druhý řádek: vlevo Přidat seznam, vpravo Theme / Language */}
+      {/* 2) Druhý řádek */}
       <div className="flex justify-between items-center mb-6">
 
-        {/* Levá strana */}
+        {/* Levá strana – Přidat seznam */}
         <button
           onClick={() => setShowModal(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         >
-          + Přidat seznam
+          + {t.addList}
         </button>
 
-        {/* Pravá strana */}
+        {/* Pravá strana – Theme + Language */}
         <div className="flex gap-3">
 
-          {/* Dark mode toggle */}
+          {/* Dark / Light toggle */}
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2"
           >
-            {theme === "light" ? "🌙 Dark mode" : "☀️ Light mode"}
+            {theme === "light" ? "🌙" : "☀️"}
+            {theme === "light" ? t.darkMode : t.lightMode}
           </button>
 
           {/* Language toggle */}
           <button
-            onClick={() => alert('Language switching soon')}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            onClick={() => changeLang(lang === "cs" ? "en" : "cs")}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2"
           >
-            CZ / EN
+            {lang === "cs" ? "🇨🇿" : "🇬🇧"}
+            {t.language}
           </button>
-
         </div>
       </div>
 
@@ -72,7 +77,7 @@ export default function DashboardPage() {
               list.owner?.email,
               ...(list.sharedWith?.map((u) => u.email) || [])
             ]}
-            items={[]}  // zatím nerozesíláme preview položky
+            items={[]} 
             onClick={() => navigate(`/detail/${list._id}`)}
           />
         ))}
