@@ -1,41 +1,31 @@
 import { createContext, useContext, useState, useMemo, useEffect } from "react";
 import { api, getToken, setToken, clearToken } from "../api";
 
-const Ctx = createContext();
-export const useAuth = () => useContext(Ctx);
+const AuthCtx = createContext();
+export const useAuth = () => useContext(AuthCtx);
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const token = getToken();
-    return token ? { token } : null;
+    const saved = localStorage.getItem("user");
+    return token && saved ? JSON.parse(saved) : null;
   });
 
-  // pokud token expiroval nebo je nevalidní → smažeme ho
-  useEffect(() => {
-    if (!getToken()) setUser(null);
-  }, []);
+  const login = async (email, password) => {
+    const { token, user } = await api.login(email, password);
 
-  const value = useMemo(
-    () => ({
-      user,
+    setToken(token);
+    setUser(user);
+    localStorage.setItem("user", JSON.stringify(user));
+  };
 
-      async login(email, password) {
-        const { token } = await api.login(email, password);
-        setToken(token);
-        setUser({ token });
-      },
+  const logout = () => {
+    clearToken();
+    setUser(null);
+    localStorage.removeItem("user");
+  };
 
-      async register(name, surename, email, password) {
-        await api.register(name, surename, email, password);
-      },
+  const value = useMemo(() => ({ user, login, logout }), [user]);
 
-      logout() {
-        clearToken();
-        setUser(null);
-      },
-    }),
-    [user]
-  );
-
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
