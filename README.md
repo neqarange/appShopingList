@@ -1,105 +1,99 @@
-# Shopping List App
+https://github.com/neqarange/appShopingList/raw/main/sopingListAppDEMO.mp4
 
-Jednoduchá webová aplikace pro správu nákupních seznamů.  
-Projekt je postavený na **Reactu** (frontend) a **Node.js + Express** (backend).  
-Stylování je řešeno pomocí **Tailwind CSS**.
+# 🛒 Shopping List Application (Full Stack)
 
----
+## 📌 Project Overview
 
-## Funkce
+This project is a full-stack Shopping List web application.
+Users can create, manage and share shopping lists with items.
 
-- Zobrazení všech nákupních seznamů (Dashboard)
-- Možnost přidávat nové položky
-- Úprava a mazání existujících položek
-- Detailní zobrazení jednotlivého seznamu
-- Ukládání dat (např. pomocí mock dat nebo API endpointů)
-- Stylování pomocí Tailwindu
+The application includes:
+- Frontend (React)
+- Backend (Node.js + Express)
+- Database (MongoDB)
 
 ---
 
-## Struktura projektu
+## ✨ Features
 
-```
-shopingList/
-├── frontend/               # React aplikace
-│   ├── src/
-│   │   ├── components/
-│   │   │   └── Dashboard/
-│   │   │       ├── Detail/
-│   │   │       │   ├── ActionButtons.jsx
-│   │   │       │   ├── DeleteItem.jsx
-│   │   │       │   ├── ItemForm.jsx
-│   │   │       │   ├── QuantitySelector.jsx
-│   │   │       │   └── SaveNewItem.jsx
-│   │   │       ├── ListCard.jsx
-│   │   │       ├── ListItem.jsx
-│   │   │       └── MemberTag.jsx
-│   │   ├── data/
-│   │   │   └── shoppingLists.js
-│   │   ├── pages/
-│   │   │   ├── DashboardPage.jsx
-│   │   │   └── DetailPage.jsx
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   └── index.css
-│   ├── tailwind.config.js
-│   └── postcss.config.js
-│
-├── backend/                # Node.js + Express server (v budoucnu)
-│   └── index.js
-│
-└── README.md
-```
+### 👤 Authentication
+- User registration
+- User login
+- JWT authentication
+- Logout
+
+### 📋 Shopping Lists
+- Create shopping lists
+- View all lists
+- Open list detail
+- Delete lists
+- Archive lists
+
+### 📝 Items
+- Add items to list
+- Edit item name, description, quantity
+- Mark item as done
+- Delete item
+
+### 🎨 UI
+- Responsive design
+- Dark / Light mode
+- Language switch (EN / CZ)
+- Modern design with Tailwind CSS
 
 ---
 
-## Instalace a spuštění
+## 🛠️ Technologies
 
-### 1️⃣ Klonování repozitáře
+### Frontend
+- React
+- React Router
+- JavaScript
+- Tailwind CSS
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcrypt
+
+---
+
+## ▶️ How to Run
+
+### Clone repository
 ```bash
-git clone https://github.com/uzivatel/shopingList.git
-cd shopingList
+git clone https://github.com/neqarange/appShopingList.git
+cd appShopingList
 ```
 
-### 2️⃣ Instalace závislostí pro frontend
+### Backend
 ```bash
-cd frontend
+cd backend
 npm install
-```
-
-### 3️⃣ Spuštění vývojového serveru
-```bash
 npm start
 ```
 
-Frontend poběží na adrese:  
-👉 [http://localhost:3000](http://localhost:3000)
+Create `.env` file:
+```
+PORT=5001
+MONGODB_URI=mongodb://localhost:27017/shoppinglist
+JWT_SECRET=secret
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Frontend: http://localhost:3000  
+Backend: http://localhost:5001
 
 ---
 
-## Použité technologie
-
-- [React](https://reactjs.org/)
-- [React Router DOM](https://reactrouter.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Node.js](https://nodejs.org/)
-- [Express.js](https://expressjs.com/)
-
----
-
-## Autor
-
-**Petr Nekvinda**  
-📅 2025  
-💬 Školní projekt – _IT Programming_
-
----
-
-## 🪄 Poznámky
-
-- V adresáři `data/` jsou prozatím uložené statické datové soubory.
-- Backend (`index.js`) lze později rozšířit o REST API pro ukládání a čtení dat.
-- Take to musim spojit s databazi
-- Tailwind je nakonfigurován přes `postcss.config.js` a `tailwind.config.js`.
-
----
+## 👨‍💻 Author
+Petr Nekvinda
