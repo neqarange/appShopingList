@@ -37,6 +37,14 @@ export const translations = {
     // ActionButtons
     saveList: "Uložit seznam",
     deleteList: "Smazat seznam",
+
+    // Chart
+    purchaseStatus: "Stav nákupu",
+    bought: "Koupeno",
+    notBought: "Nekoupeno",
+
+    // User
+    logout: "Odhlásit se",
   },
 
   en: {
@@ -77,7 +85,13 @@ export const translations = {
     // ActionButtons
     saveList: "Save list",
     deleteList: "Delete list",
+
+    // Chart
+    purchaseStatus: "Purchase status",
+    bought: "Bought",
+    notBought: "Not bought",
+
+    // User
+    logout: "Logout",
   },
 };
-
-
