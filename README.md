@@ -1,6 +1,10 @@
 
 # 🛒 Shopping List Application (Full Stack)
 
+https://github.com/user-attachments/assets/8b2d029b-fb69-49ad-8269-c81ed4450133
+
+
+
 ## 📌 Project Overview
 
 This project is a full-stack Shopping List web application.
