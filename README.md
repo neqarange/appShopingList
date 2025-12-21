@@ -1,4 +1,3 @@
-https://github.com/neqarange/appShopingList/raw/main/sopingListAppDEMO.mp4
 
 # 🛒 Shopping List Application (Full Stack)
 
