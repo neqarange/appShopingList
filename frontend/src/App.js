@@ -36,18 +36,27 @@ function Header() {
 
   return (
     <>
-      <header className="w-full px-6 py-4 bg-gray-900 text-white shadow-lg flex justify-between items-center">
+      <header
+        className="
+          w-full bg-gray-900 text-white shadow-lg
+          px-4 sm:px-6 py-4
+          flex flex-col gap-4
+          lg:flex-row lg:items-center lg:justify-between
+        "
+      >
         {/* LEFT */}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-3xl">🛒</span>
-            <span className="text-2xl font-bold">{t.title}</span>
+            <span className="text-2xl sm:text-3xl">🛒</span>
+            <span className="text-xl sm:text-2xl font-bold">
+              {t.title}
+            </span>
           </Link>
 
-          <div className="flex gap-2 ml-6">
+          <div className="flex gap-2">
             <button
               onClick={() => switchView("active")}
-              className={`px-4 py-2 rounded-full ${
+              className={`px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base ${
                 view === "active"
                   ? "bg-blue-600"
                   : "bg-gray-700 hover:bg-gray-600"
@@ -58,7 +67,7 @@ function Header() {
 
             <button
               onClick={() => switchView("archived")}
-              className={`px-4 py-2 rounded-full ${
+              className={`px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base ${
                 view === "archived"
                   ? "bg-blue-600"
                   : "bg-gray-700 hover:bg-gray-600"
@@ -71,7 +80,7 @@ function Header() {
           {view === "active" && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 bg-blue-600 rounded-full"
+              className="px-3 sm:px-4 py-2 bg-blue-600 rounded-full text-sm sm:text-base"
             >
               + {t.addList}
             </button>
@@ -79,7 +88,7 @@ function Header() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 justify-end">
           <button
             onClick={() => changeLang(lang === "cs" ? "en" : "cs")}
             className="px-3 py-2 bg-gray-700 rounded-full"
@@ -89,12 +98,11 @@ function Header() {
 
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="px-4 py-2 bg-gray-700 rounded-full"
+            className="px-3 py-2 bg-gray-700 rounded-full"
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
 
-          {/* USER MENU */}
           <UserMenu />
         </div>
       </header>
@@ -115,7 +123,6 @@ export default function App() {
       <Header />
 
       <Routes>
-        {/* PUBLIC */}
         <Route
           path="/login"
           element={
@@ -133,7 +140,6 @@ export default function App() {
           }
         />
 
-        {/* PRIVATE */}
         <Route
           path="/"
           element={
@@ -154,3 +160,4 @@ export default function App() {
     </Router>
   );
 }
+

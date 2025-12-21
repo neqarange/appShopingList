@@ -45,18 +45,15 @@ export default function DetailPage() {
   async function toggleBought(item) {
     if (isArchived) return;
 
-    // okamžitě přepni UI (spolehlivé)
     setItems((prev) =>
       prev.map((x) =>
         x._id === item._id ? { ...x, bought: !x.bought } : x
       )
     );
 
-    // backend
     try {
       await api.setBought(id, item._id, !item.bought);
     } catch (e) {
-      // rollback při chybě
       setItems((prev) =>
         prev.map((x) =>
           x._id === item._id ? { ...x, bought: item.bought } : x
@@ -66,34 +63,25 @@ export default function DetailPage() {
     }
   }
 
-  async function archiveItem(item) {
-    if (isArchived) return;
-
-    try {
-      await api.archiveItem(id, item._id);
-      setItems((prev) =>
-        prev.map((x) =>
-          x._id === item._id ? { ...x, archived: true } : x
-        )
-      );
-      setSelectedItem(null);
-    } catch (e) {
-      alert(e.message);
-    }
-  }
-
   async function handleSave(updated) {
     if (isArchived) return;
 
-    try {
-      const saved = await api.updateItem(id, updated._id, updated);
-      setItems((prev) =>
-        prev.map((x) => (x._id === saved._id ? saved : x))
-      );
-      setSelectedItem(null);
-    } catch (e) {
-      alert(e.message);
-    }
+    const saved = await api.updateItem(id, updated._id, updated);
+    setItems((prev) =>
+      prev.map((x) => (x._id === saved._id ? saved : x))
+    );
+    setSelectedItem(null);
+  }
+
+  async function archiveItem(item) {
+    if (isArchived) return;
+    await api.archiveItem(id, item._id);
+    setItems((prev) =>
+      prev.map((x) =>
+        x._id === item._id ? { ...x, archived: true } : x
+      )
+    );
+    setSelectedItem(null);
   }
 
   async function handleDeleteList() {
@@ -111,89 +99,84 @@ export default function DetailPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-      {/* Header */}
-      <div className="sticky top-0 bg-gray-100 dark:bg-gray-900 px-6 pt-6 pb-4 shadow z-20">
+      {/* TOP BAR */}
+      <div className="sticky top-0 z-20 bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 py-4 shadow">
         <button
           onClick={() => navigate(-1)}
-          className="text-blue-600 dark:text-blue-300 hover:underline"
+          className="text-blue-600 dark:text-blue-300 text-sm hover:underline"
         >
           ← {t.back}
         </button>
 
-        <h1 className="text-3xl font-bold text-center mt-3">
+        <h1 className="text-xl sm:text-3xl font-bold text-center mt-2">
           {list?.name}
         </h1>
 
         {isArchived && (
-          <p className="text-center text-yellow-500 font-medium mt-2">
-            ⚠️ Tento seznam je archivovaný (read-only)
+          <p className="text-center text-yellow-500 text-sm mt-1">
+            ⚠️ Read only
           </p>
         )}
       </div>
 
-      {/* Items */}
-      <div className="p-6 space-y-4">
+      {/* ITEMS */}
+      <div className="px-4 sm:px-6 py-6 space-y-3">
         {items.map((item) => (
           <div
             key={item._id}
             className={`
-              p-4 rounded-2xl flex justify-between items-center
-              bg-white dark:bg-gray-800 shadow-sm
-              hover:shadow-xl transition
+              flex items-center justify-between gap-3
+              p-3 sm:p-4 rounded-xl
+              bg-white dark:bg-gray-800
+              shadow-sm
               ${isArchived ? "opacity-60" : ""}
             `}
           >
-            {/* Klikací jen název */}
             <button
-              type="button"
               disabled={isArchived}
               onClick={() => setSelectedItem(item)}
-              className="flex-1 text-left pr-4"
+              className="flex-1 text-left text-sm sm:text-lg"
             >
               <span
-                className={`text-lg ${
-                  item.bought ? "line-through text-gray-400" : ""
-                }`}
+                className={
+                  item.bought
+                    ? "line-through text-gray-400"
+                    : ""
+                }
               >
                 {item.name}
               </span>
             </button>
 
-            {/* Checkbox – izolovaný */}
             <input
               type="checkbox"
               checked={!!item.bought}
               disabled={isArchived}
               onChange={() => toggleBought(item)}
-              className="w-5 h-5 accent-blue-600"
+              className="w-4 h-4 sm:w-5 sm:h-5 accent-blue-600"
             />
           </div>
         ))}
       </div>
 
-{/* Detail + graf – center layout */}
-<div className="max-w-4xl mx-auto px-6 space-y-10">
+      {/* DETAIL + CHART */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
+        {selectedItem && !isArchived && (
+          <ItemForm
+            item={selectedItem}
+            onSave={handleSave}
+            onDelete={() => archiveItem(selectedItem)}
+          />
+        )}
 
-  {/* Detail položky */}
-  {selectedItem && !isArchived && (
-    <ItemForm
-      item={selectedItem}
-      onSave={handleSave}
-      onDelete={() => archiveItem(selectedItem)}
-    />
-  )}
+        {items.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6">
+            <BoughtItemsChart items={items} />
+          </div>
+        )}
+      </div>
 
-  {/* Graf */}
-  {items.length > 0 && (
-    <div className="bg-gray-800/60 rounded-2xl p-6">
-      <BoughtItemsChart items={items} />
-    </div>
-  )}
-
-</div>
-
-
-      {/* Akce */}
+      {/* ACTIONS */}
       <ActionButtons
         onAdd={!isArchived ? handleAdd : undefined}
         onSave={isOwner && !isArchived ? handleArchiveList : undefined}
@@ -202,4 +185,5 @@ export default function DetailPage() {
     </div>
   );
 }
+
 

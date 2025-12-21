@@ -4,33 +4,36 @@ export default function ActionButtons({ onAdd, onSave, onDelete }) {
   const { t } = useLanguage();
 
   return (
-    <div className="flex justify-center gap-10 mt-8">
-
-      {/* ADD ITEM */}
+    <div
+      className="
+        sticky bottom-0 z-10
+        bg-gray-100 dark:bg-gray-900
+        px-4 py-4
+        flex flex-wrap justify-center gap-3
+      "
+    >
       {onAdd && (
         <button
           onClick={onAdd}
-          className="flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
+          className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm sm:text-base"
         >
           ➕ {t.addItem}
         </button>
       )}
 
-      {/* SAVE LIST */}
       {onSave && (
         <button
           onClick={onSave}
-          className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm sm:text-base"
         >
           💾 {t.saveList}
         </button>
       )}
 
-      {/* DELETE LIST */}
       {onDelete && (
         <button
           onClick={onDelete}
-          className="flex items-center gap-2 px-5 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+          className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm sm:text-base"
         >
           🗑️ {t.deleteList}
         </button>
