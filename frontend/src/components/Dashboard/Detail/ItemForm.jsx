@@ -19,38 +19,29 @@ export default function ItemForm({ item, onSave, onDelete }) {
   const handleSave = () => onSave({ ...item, ...formData });
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow mt-6 space-y-4 transition-colors">
-
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow space-y-4">
+      <h3 className="text-lg font-semibold">
         {t.itemDetail}
       </h3>
 
       <div className="space-y-2">
-
-        <label className="block text-sm font-medium dark:text-gray-200">
-          {t.name}
-        </label>
+        <label className="text-sm">{t.name}</label>
         <input
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full border rounded-lg p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
+          className="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600"
         />
 
-        <label className="block text-sm font-medium dark:text-gray-200">
-          {t.description}
-        </label>
+        <label className="text-sm">{t.description}</label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="w-full border rounded-lg p-2 bg-white dark:bg-gray-700 dark:text-gray-100"
+          className="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600"
         />
 
-        <label className="block text-sm font-medium dark:text-gray-200">
-          {t.quantity}
-        </label>
-
+        <label className="text-sm">{t.quantity}</label>
         <QuantitySelector
           value={formData.quantity}
           onIncrement={() =>
@@ -65,10 +56,11 @@ export default function ItemForm({ item, onSave, onDelete }) {
         />
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-2">
         <DeleteItem onClick={onDelete} label={t.deleteItem} />
         <SaveNewItem onClick={handleSave} label={t.saveItem} />
       </div>
     </div>
   );
 }
+

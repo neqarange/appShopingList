@@ -10,12 +10,8 @@ export default function DashboardPage() {
 
   const view = params.get("view") || "active";
 
-  const refreshLists = () => {
-    api.getLists().then(setLists).catch(console.error);
-  };
-
   useEffect(() => {
-    refreshLists();
+    api.getLists().then(setLists).catch(console.error);
   }, []);
 
   const filtered = lists.filter((list) =>
@@ -23,11 +19,14 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-
-      {/* No header or title here anymore */}
-
-      <div className="grid gap-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 py-6">
+      <div
+        className="
+          grid gap-4
+          sm:grid-cols-2
+          lg:grid-cols-3
+        "
+      >
         {filtered.map((list) => (
           <ListCard
             key={list._id}
@@ -35,7 +34,7 @@ export default function DashboardPage() {
             archived={list.archived}
             members={[
               list.owner?.email,
-              ...(list.sharedWith?.map((u) => u.email) || [])
+              ...(list.sharedWith?.map((u) => u.email) || []),
             ]}
             onClick={() => navigate(`/detail/${list._id}`)}
           />
@@ -44,6 +43,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-
