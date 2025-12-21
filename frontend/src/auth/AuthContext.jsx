@@ -7,7 +7,6 @@ export const useAuth = () => useContext(AuthCtx);
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // Load session on startup
   useEffect(() => {
     const token = getToken();
     const storedUser = localStorage.getItem("user");
@@ -23,25 +22,26 @@ export default function AuthProvider({ children }) {
 
   // LOGIN
   const login = async (email, password) => {
-    try {
-      const { token, user } = await api.login(email, password);
+    const { token, user } = await api.login(email, password);
 
-      if (!token || !user) throw new Error("Invalid login response");
+    if (!token || !user) throw new Error("Invalid login response");
 
-      setToken(token);
+    setToken(token);
 
-      const formattedUser = {
-        _id: user._id,
-        email: user.email,
-        name: user.name || "",
-        surename: user.surename || "",
-      };
+    const formattedUser = {
+      _id: user._id,
+      email: user.email,
+      name: user.name || "",
+      surename: user.surename || "",
+    };
 
-      setUser(formattedUser);
-      localStorage.setItem("user", JSON.stringify(formattedUser));
-    } catch (err) {
-      throw err;
-    }
+    setUser(formattedUser);
+    localStorage.setItem("user", JSON.stringify(formattedUser));
+  };
+
+  // REGISTER ✅
+  const register = async (name, surename, email, password) => {
+    await api.register(name, surename, email, password);
   };
 
   // LOGOUT
@@ -51,9 +51,13 @@ export default function AuthProvider({ children }) {
     localStorage.removeItem("user");
   };
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  const value = useMemo(
+    () => ({ user, login, register, logout }),
+    [user]
+  );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
+
 
 
